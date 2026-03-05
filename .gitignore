@@ -1,0 +1,26 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node (テストツール等を使う場合)
+node_modules/
+npm-debug.log*
+
+# Chrome Extension パッケージ
+*.crx
+*.pem
+*.zip
+
+# テスト用ファイル
+test/
+
+# アイコン生成用の元画像
+icons/src/

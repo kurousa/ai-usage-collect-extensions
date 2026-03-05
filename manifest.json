@@ -1,0 +1,42 @@
+{
+    "manifest_version": 3,
+    "name": "AI Usage Tracker",
+    "version": "1.0.0",
+    "description": "AIサービスの利用履歴（プロンプト送信アクション）を検知し、BigQueryへログとして蓄積する拡張機能",
+    "permissions": [
+        "identity",
+        "identity.email",
+        "storage",
+        "activeTab"
+    ],
+    "host_permissions": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://www.perplexity.ai/*",
+        "https://notebooklm.google.com/*",
+        "https://app.devin.ai/*",
+        "https://gemini.google.com/*",
+        "https://script.google.com/*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://chatgpt.com/*",
+                "https://chat.openai.com/*",
+                "https://www.perplexity.ai/*",
+                "https://notebooklm.google.com/*",
+                "https://app.devin.ai/*",
+                "https://gemini.google.com/*"
+            ],
+            "js": [
+                "config.js",
+                "content.js"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
+    "options_page": "options.html"
+}

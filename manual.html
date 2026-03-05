@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>AI Usage Tracker - セットアップガイド</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: #e0e0e0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #a78bfa, #60a5fa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-bottom: 32px;
+        }
+
+        h2 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #c4b5fd;
+            margin-top: 32px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        h2 .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #7c3aed, #6366f1);
+            border-radius: 50%;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: white;
+            margin-right: 10px;
+            -webkit-text-fill-color: white;
+        }
+
+        .step-content {
+            padding-left: 4px;
+            margin-bottom: 24px;
+        }
+
+        p {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: #d1d5db;
+            margin-bottom: 12px;
+        }
+
+        ol,
+        ul {
+            padding-left: 20px;
+            margin-bottom: 12px;
+        }
+
+        li {
+            font-size: 0.9rem;
+            line-height: 1.8;
+            color: #d1d5db;
+        }
+
+        code {
+            background: rgba(167, 139, 250, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #c4b5fd;
+            font-family: "Fira Code", "Cascadia Code", monospace;
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 12px 0;
+            overflow-x: auto;
+            font-family: "Fira Code", "Cascadia Code", monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            color: #a5b4fc;
+        }
+
+        .note {
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin: 16px 0;
+            font-size: 0.85rem;
+            color: #93c5fd;
+        }
+
+        .note::before {
+            content: "💡 ";
+        }
+
+        .warning {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin: 16px 0;
+            font-size: 0.85rem;
+            color: #fcd34d;
+        }
+
+        .warning::before {
+            content: "⚠️ ";
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 32px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            color: #c4b5fd;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .schema-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+        }
+
+        .schema-table th,
+        .schema-table td {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .schema-table th {
+            color: #a78bfa;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .schema-table td {
+            color: #d1d5db;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>📖 GAS Webhook セットアップガイド</h1>
+        <p class="subtitle">AI Usage Tracker の GAS Webhook URL を取得するまでの手順</p>
+
+        <!-- Step 1 -->
+        <h2><span class="step-number">1</span>Google Apps Script プロジェクトを作成</h2>
+        <div class="step-content">
+            <ol>
+                <li><a href="https://script.google.com/" target="_blank" style="color:#93c5fd">Google Apps Script</a>
+                    にアクセス</li>
+                <li>左上の <strong>「＋ 新しいプロジェクト」</strong> をクリック</li>
+                <li>プロジェクト名を「AI Usage Tracker」などに変更（任意）</li>
+            </ol>
+        </div>
+
+        <!-- Step 2 -->
+        <h2><span class="step-number">2</span>コードを貼り付け</h2>
+        <div class="step-content">
+            <p>エディタに表示されている <code>コード.gs</code> のデフォルトコードを全て削除し、拡張機能に同梱されている <code>gas/Code.gs</code> の内容を貼り付けます。</p>
+            <p><code>PROJECT_ID</code> を自身の <strong>GCPプロジェクトID</strong> に変更してください：</p>
+            <div class="code-block">
+                const PROJECT_ID = "your-gcp-project-id"; &nbsp;// ← ここを変更<br>
+                const DATASET_ID = "ai_usage_logs";<br>
+                const TABLE_ID &nbsp; = "usage_events";
+            </div>
+            <div class="note">
+                GCPプロジェクトIDは <a href="https://console.cloud.google.com/" target="_blank" style="color:#93c5fd">Google
+                    Cloud Console</a> のプロジェクト選択画面で確認できます。
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <h2><span class="step-number">3</span>BigQuery API サービスを有効化</h2>
+        <div class="step-content">
+            <ol>
+                <li>GASエディタ左サイドバーの <strong>「サービス」</strong> の横にある <strong>「＋」</strong> をクリック</li>
+                <li>一覧から <strong>「BigQuery API」</strong> を選択</li>
+                <li>識別子が <code>BigQuery</code> であることを確認して <strong>「追加」</strong> をクリック</li>
+            </ol>
+            <div class="note">
+                GCP側でも BigQuery API が有効になっている必要があります。<a
+                    href="https://console.cloud.google.com/apis/library/bigquery.googleapis.com" target="_blank"
+                    style="color:#93c5fd">こちら</a>から有効化できます。
+            </div>
+        </div>
+
+        <!-- Step 4 -->
+        <h2><span class="step-number">4</span>ウェブアプリとしてデプロイ</h2>
+        <div class="step-content">
+            <ol>
+                <li>GASエディタ右上の <strong>「デプロイ」</strong> → <strong>「新しいデプロイ」</strong> をクリック</li>
+                <li>種類の選択で <strong>「ウェブアプリ」</strong> を選択</li>
+                <li>以下の設定にしてください：</li>
+            </ol>
+            <table class="schema-table">
+                <tr>
+                    <th>設定項目</th>
+                    <th>値</th>
+                </tr>
+                <tr>
+                    <td>説明</td>
+                    <td>任意（例: "AI Usage Tracker v1"）</td>
+                </tr>
+                <tr>
+                    <td>次のユーザーとして実行</td>
+                    <td><strong>自分</strong></td>
+                </tr>
+                <tr>
+                    <td>アクセスできるユーザー</td>
+                    <td><strong>全員</strong></td>
+                </tr>
+            </table>
+            <div class="warning">
+                「次のユーザーとして実行」を「自分」、「アクセスできるユーザー」を「全員」に設定しないと、拡張機能からのリクエストが 401 エラーになります。
+            </div>
+        </div>
+
+        <!-- Step 5 -->
+        <h2><span class="step-number">5</span>Webhook URL をコピー</h2>
+        <div class="step-content">
+            <p>デプロイ完了後に表示される <strong>「ウェブアプリ URL」</strong> をコピーします。</p>
+            <div class="code-block">
+                https://script.google.com/macros/s/AKfycb.../exec
+            </div>
+            <p>この URL を、拡張機能のオプション画面（設定画面）の <strong>「GAS Webhook URL」</strong> フィールドに貼り付けて保存してください。</p>
+        </div>
+
+        <!-- Step 6 -->
+        <h2><span class="step-number">6</span>接続テスト</h2>
+        <div class="step-content">
+            <p>オプション画面の <strong>「💾 保存して接続テスト」</strong> ボタンを押すと、自動的にテストリクエストを送信します。</p>
+            <p>「✅ 接続成功」と表示されればセットアップ完了です。</p>
+            <div class="note">
+                BigQueryのデータセット・テーブルが未作成の場合は、最初のデータ送信時に自動的に作成されます。
+            </div>
+        </div>
+
+        <!-- BigQuery Schema -->
+        <h2>📊 BigQuery テーブルスキーマ</h2>
+        <div class="step-content">
+            <p>以下のスキーマで <code>ai_usage_logs.usage_events</code> テーブルが自動作成されます：</p>
+            <table class="schema-table">
+                <tr>
+                    <th>カラム名</th>
+                    <th>型</th>
+                    <th>説明</th>
+                </tr>
+                <tr>
+                    <td><code>user_email</code></td>
+                    <td>STRING</td>
+                    <td>ユーザーメールアドレス</td>
+                </tr>
+                <tr>
+                    <td><code>service_name</code></td>
+                    <td>STRING</td>
+                    <td>AIサービス名</td>
+                </tr>
+                <tr>
+                    <td><code>action</code></td>
+                    <td>STRING</td>
+                    <td>アクション種別</td>
+                </tr>
+                <tr>
+                    <td><code>timestamp</code></td>
+                    <td>TIMESTAMP</td>
+                    <td>検知日時</td>
+                </tr>
+                <tr>
+                    <td><code>url</code></td>
+                    <td>STRING</td>
+                    <td>利用URL</td>
+                </tr>
+                <tr>
+                    <td><code>inserted_at</code></td>
+                    <td>TIMESTAMP</td>
+                    <td>BQ挿入日時</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- コードの更新方法 -->
+        <h2>🔄 GASコードの更新方法</h2>
+        <div class="step-content">
+            <p>GASのコードを修正した場合は、<strong>再デプロイ</strong>が必要です：</p>
+            <ol>
+                <li>「デプロイ」→「デプロイを管理」</li>
+                <li>鉛筆（✏️）アイコンをクリック</li>
+                <li>バージョンを <strong>「新しいバージョン」</strong> に変更</li>
+                <li>「デプロイ」をクリック</li>
+            </ol>
+            <div class="warning">
+                バージョンを「新しいバージョン」に変更しないと、古いコードのまま実行されます。
+            </div>
+        </div>
+
+        <a href="options.html" class="back-link">← 設定画面に戻る</a>
+    </div>
+</body>
+
+</html>
