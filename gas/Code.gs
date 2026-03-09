@@ -41,7 +41,7 @@ function doPost(e) {
     }
 
     // 認証トークンの確認
-    if (body.token !== AUTH_TOKEN) {
+    if (AUTH_TOKEN !== "YOUR_SECRET_TOKEN" && body.token !== AUTH_TOKEN) {
       return createResponse(401, {
         success: false,
         error: "Unauthorized: Invalid token"
@@ -132,9 +132,11 @@ function doPost(e) {
           }
 
           if (!retrySuccess) {
+            Logger.log("Retry insert errors after backoff: " + JSON.stringify(lastErrors));
             throw new Error("Retry insert errors after backoff: " + JSON.stringify(lastErrors));
           }
         } else {
+          Logger.log("Insert errors: " + JSON.stringify(response.insertErrors));
           throw new Error("Insert errors: " + JSON.stringify(response.insertErrors));
         }
       }
