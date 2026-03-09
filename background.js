@@ -86,8 +86,21 @@ async function postToGas(url, data, retryCount = CONFIG.MAX_RETRY_COUNT) {
 
 // --- メッセージリスナー ---
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    // 許可された送信元かチェック（自分の拡張機能以外からのメッセージを無視）
+    if (sender.id !== chrome.runtime.id) {
+        console.warn("[AI Usage Tracker] 拒否されたメッセージ送信元:", sender.id);
+        return false;
+    }
+
     // --- 接続テスト（オプション画面から） ---
     if (message.type === "CONNECTION_TEST") {
+        // オプション画面からのリクエストであることをURLで追加検証
+        const optionsUrl = `chrome-extension://${chrome.runtime.id}/options.html`;
+        if (!sender.url || !sender.url.startsWith(optionsUrl)) {
+            console.warn("[AI Usage Tracker] CONNECTION_TEST が許可されていないURLから送信されました:", sender.url);
+            return false;
+        }
+
         (async () => {
             try {
                 const result = await postToGas(message.url, message.payload, 0);
