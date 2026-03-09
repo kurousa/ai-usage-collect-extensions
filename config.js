@@ -9,6 +9,9 @@ const CONFIG = {
     /** デフォルトのGAS Webhook URL（オプション画面で上書き可能） */
     DEFAULT_GAS_WEBHOOK_URL: "",
 
+    /** GAS 認証用トークン */
+    AUTH_TOKEN: "YOUR_SECRET_TOKEN",
+
     /** デバウンス間隔（ミリ秒） - 同一操作の多重検知防止 */
     DEBOUNCE_INTERVAL_MS: 2000,
 

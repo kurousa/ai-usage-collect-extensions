@@ -9,6 +9,7 @@
     "use strict";
 
     const webhookUrlInput = document.getElementById("webhookUrl");
+    const authTokenInput = document.getElementById("authToken");
     const saveBtn = document.getElementById("saveBtn");
     const testBtn = document.getElementById("testBtn");
     const statusEl = document.getElementById("status");
@@ -21,7 +22,7 @@
     }
 
     // --- 接続テスト（background.js 経由） ---
-    function runConnectionTest(url) {
+    function runConnectionTest(url, token) {
         showStatus("🔄 接続テスト中...", "info");
 
         chrome.runtime.sendMessage(
@@ -32,8 +33,10 @@
                     user_email: "test@example.com",
                     service_name: "connection_test",
                     action: "ping",
+                    prompt_text: "test_prompt",
                     timestamp: new Date().toISOString(),
-                    url: "chrome-extension://options"
+                    url: "chrome-extension://options",
+                    token: token || ""
                 }
             },
             (response) => {
@@ -68,28 +71,36 @@
     // --- 保存して接続テスト ---
     saveBtn.addEventListener("click", () => {
         const url = webhookUrlInput.value.trim();
+        const token = authTokenInput.value.trim();
         if (!validateUrl(url)) return;
 
-        chrome.storage.sync.set({ gasWebhookUrl: url }, () => {
+        chrome.storage.sync.set({ gasWebhookUrl: url, authToken: token }, () => {
             if (chrome.runtime.lastError) {
                 showStatus("保存に失敗しました: " + chrome.runtime.lastError.message, "error");
                 return;
             }
-            runConnectionTest(url);
+            runConnectionTest(url, token);
         });
     });
 
     // --- 接続テストのみ ---
     testBtn.addEventListener("click", () => {
         const url = webhookUrlInput.value.trim();
+        const token = authTokenInput.value.trim();
         if (!validateUrl(url)) return;
-        runConnectionTest(url);
+        runConnectionTest(url, token);
     });
 
     // --- 保存済みURL読み込み ---
-    chrome.storage.sync.get(["gasWebhookUrl"], (result) => {
+    chrome.storage.sync.get(["gasWebhookUrl", "authToken"], (result) => {
         if (result.gasWebhookUrl) {
             webhookUrlInput.value = result.gasWebhookUrl;
+        }
+        if (result.authToken !== undefined) {
+            authTokenInput.value = result.authToken;
+        } else if (CONFIG && CONFIG.AUTH_TOKEN) {
+            // storageに未保存で、config.jsに定義がある場合はそれを利用
+            authTokenInput.value = CONFIG.AUTH_TOKEN;
         }
     });
 
