@@ -68,7 +68,7 @@ function doPost(e) {
     };
 
     try {
-      var response = BigQuery.Tabledata.insertAll(
+      const response = BigQuery.Tabledata.insertAll(
         insertAllRequest,
         PROJECT_ID,
         DATASET_ID,
