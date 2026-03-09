@@ -81,7 +81,7 @@ function doPost(e) {
         if (errorStr.indexOf("no such field") !== -1) {
           Logger.log("Field not found. Updating table schema to add prompt_text...");
           addPromptTextColumn();
-          Utilities.sleep(5000); // 反映待ち
+          Utilities.sleep(10000); // 10秒待機（BigQueryのスキーマ変更は反映に時間がかかる場合があるため）
           var retryResponse = BigQuery.Tabledata.insertAll(
             insertAllRequest,
             PROJECT_ID,

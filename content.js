@@ -146,11 +146,16 @@
                             let promptText = "";
                             const textareaSelectors = currentService.selectors.textarea.split(",").map(s => s.trim());
                             for (const taSel of textareaSelectors) {
-                                const inputArea = document.querySelector(taSel);
-                                if (inputArea) {
-                                    promptText = inputArea.value || inputArea.innerText || inputArea.textContent || "";
-                                    break;
+                                // 複数見つかる可能性がある場合、入力がある要素を優先して探す
+                                const inputAreas = document.querySelectorAll(taSel);
+                                for (const area of inputAreas) {
+                                    const text = area.value || area.innerText || area.textContent || "";
+                                    if (text.trim().length > 0) {
+                                        promptText = text;
+                                        break; // 空ではないテキストが見つかったら終了
+                                    }
                                 }
+                                if (promptText) break;
                             }
 
                             notifyUsage("send_button_click", promptText.trim());
