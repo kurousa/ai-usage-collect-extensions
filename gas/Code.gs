@@ -41,7 +41,21 @@ function doPost(e) {
     }
 
     // 認証トークンの確認
-    if (AUTH_TOKEN !== "YOUR_SECRET_TOKEN" && body.token !== AUTH_TOKEN) {
+    // 認証トークンの確認
+    // AUTH_TOKENがデフォルト値のまま、または未設定の場合はセキュリティリスクのため処理を停止
+    if (!AUTH_TOKEN || AUTH_TOKEN === "YOUR_SECRET_TOKEN") {
+      Logger.log("Security Alert: AUTH_TOKEN is not configured. Please configure a secret token in gas/Code.gs.");
+      return createResponse(500, {
+        success: false,
+        error: "Server configuration error: Authentication token is not set."
+      });
+    }
+    if (body.token !== AUTH_TOKEN) {
+      return createResponse(401, {
+        success: false,
+        error: "Unauthorized: Invalid token"
+      });
+    }
       return createResponse(401, {
         success: false,
         error: "Unauthorized: Invalid token"
