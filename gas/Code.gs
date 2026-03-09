@@ -48,7 +48,7 @@ function doPost(e) {
     }
 
     // 4. BigQueryへストリーミングインサート
-    var row = {
+    const row = {
       user_email: body.user_email,
       service_name: body.service_name,
       action: body.action,
@@ -58,7 +58,7 @@ function doPost(e) {
       inserted_at: new Date().toISOString()
     };
 
-    var insertAllRequest = {
+    const insertAllRequest = {
       rows: [
         {
           insertId: Utilities.getUuid(), // 重複排除用
@@ -68,7 +68,7 @@ function doPost(e) {
     };
 
     try {
-      var response = BigQuery.Tabledata.insertAll(
+      const response = BigQuery.Tabledata.insertAll(
         insertAllRequest,
         PROJECT_ID,
         DATASET_ID,
@@ -77,12 +77,12 @@ function doPost(e) {
 
       // 200 OK で返るエラー (スキーマ不一致など) を検知
       if (response.insertErrors && response.insertErrors.length > 0) {
-        var errorStr = JSON.stringify(response.insertErrors);
+        const errorStr = JSON.stringify(response.insertErrors);
         if (errorStr.indexOf("no such field") !== -1) {
           Logger.log("Field not found. Updating table schema to add prompt_text...");
           addPromptTextColumn();
           Utilities.sleep(10000); // 10秒待機（BigQueryのスキーマ変更は反映に時間がかかる場合があるため）
-          var retryResponse = BigQuery.Tabledata.insertAll(
+          const retryResponse = BigQuery.Tabledata.insertAll(
             insertAllRequest,
             PROJECT_ID,
             DATASET_ID,
@@ -165,7 +165,7 @@ function createBigQueryTable() {
     BigQuery.Datasets.get(PROJECT_ID, DATASET_ID);
     Logger.log("Dataset already exists: " + DATASET_ID);
   } catch (e) {
-    var dataset = {
+    const dataset = {
       datasetReference: {
         projectId: PROJECT_ID,
         datasetId: DATASET_ID
@@ -177,7 +177,7 @@ function createBigQueryTable() {
   }
 
   // テーブルを作成
-  var table = {
+  const table = {
     tableReference: {
       projectId: PROJECT_ID,
       datasetId: DATASET_ID,
@@ -214,12 +214,12 @@ function createBigQueryTable() {
 function addPromptTextColumn() {
   try {
     // 現在のテーブルスキーマを取得
-    var table = BigQuery.Tables.get(PROJECT_ID, DATASET_ID, TABLE_ID);
-    var schema = table.schema;
-    var fields = schema.fields;
+    const table = BigQuery.Tables.get(PROJECT_ID, DATASET_ID, TABLE_ID);
+    const schema = table.schema;
+    const fields = schema.fields;
 
     // すでに存在するか確認
-    var hasPromptText = fields.some(function(field) {
+    const hasPromptText = fields.some(function(field) {
       return field.name === "prompt_text";
     });
 
