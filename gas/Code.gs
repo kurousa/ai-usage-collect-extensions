@@ -115,7 +115,8 @@ function doPost(e) {
             TABLE_ID
           ); // リトライ
           if (retryResponse.insertErrors && retryResponse.insertErrors.length > 0) {
-            throw new Error("Retry insert errors: " + JSON.stringify(retryResponse.insertErrors));
+            Logger.log("Retry insert errors: " + JSON.stringify(retryResponse.insertErrors));
+            throw new Error("Failed to insert data after schema update.");
           }
         } else {
           throw new Error("Insert errors: " + JSON.stringify(response.insertErrors));
