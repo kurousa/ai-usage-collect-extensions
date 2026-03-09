@@ -133,11 +133,17 @@ function doPost(e) {
 
           if (!retrySuccess) {
             Logger.log("Retry insert errors after backoff: " + JSON.stringify(lastErrors));
-            throw new Error("Retry insert errors after backoff: " + JSON.stringify(lastErrors));
+            return createResponse(500, {
+              success: false,
+              error: "Retry insert errors after backoff: " + JSON.stringify(lastErrors)
+            });
           }
         } else {
           Logger.log("Insert errors: " + JSON.stringify(response.insertErrors));
-          throw new Error("Insert errors: " + JSON.stringify(response.insertErrors));
+          return createResponse(500, {
+            success: false,
+            error: "Insert errors: " + JSON.stringify(response.insertErrors)
+          });
         }
       }
     } catch (insertError) {
@@ -171,10 +177,18 @@ function doPost(e) {
         }
 
         if (!retrySuccess) {
-          throw new Error("Failed to insert after creating dataset/table");
+          Logger.log("Failed to insert after creating dataset/table");
+          return createResponse(500, {
+            success: false,
+            error: "Failed to insert after creating dataset/table"
+          });
         }
       } else {
-        throw insertError;
+        Logger.log("Insert error: " + insertError.message);
+        return createResponse(500, {
+          success: false,
+          error: "Insert error: " + insertError.message
+        });
       }
     }
 
