@@ -95,8 +95,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // --- 接続テスト（オプション画面から） ---
     if (message.type === "CONNECTION_TEST") {
         // オプション画面からのリクエストであることをURLで追加検証
-        const optionsUrl = `chrome-extension://${chrome.runtime.id}/options.html`;
-        if (!sender.url || !sender.url.startsWith(optionsUrl)) {
+        const optionsUrl = chrome.runtime.getURL("options.html");
+        if (sender.url !== optionsUrl) {
             console.warn("[AI Usage Tracker] CONNECTION_TEST が許可されていないURLから送信されました:", sender.url);
             return false;
         }
