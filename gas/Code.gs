@@ -41,7 +41,7 @@ function doPost(e) {
     }
 
     // 認証トークンの確認
-    if (AUTH_TOKEN !== "YOUR_SECRET_TOKEN" && body.token !== AUTH_TOKEN) {
+    if (body.token !== AUTH_TOKEN) {
       return createResponse(401, {
         success: false,
         error: "Unauthorized: Invalid token"
