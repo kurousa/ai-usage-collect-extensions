@@ -23,6 +23,22 @@ async function getWebhookUrl() {
 }
 
 /**
+ * chrome.storage.sync から AUTH_TOKEN を取得する
+ * @returns {Promise<string>} GAS Auth Token
+ */
+async function getAuthToken() {
+    return new Promise((resolve) => {
+        chrome.storage.sync.get(["authToken"], (result) => {
+            if (result.authToken !== undefined) {
+                resolve(result.authToken);
+            } else {
+                resolve(CONFIG.AUTH_TOKEN || "");
+            }
+        });
+    });
+}
+
+/**
  * chrome.identity でログインユーザーのメールアドレスを取得する
  * @returns {Promise<string>} ユーザーメールアドレス
  */
@@ -133,7 +149,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 );
             }
 
-            // 3. ペイロードを構築
+            // 3. トークンを取得
+            const authToken = await getAuthToken();
+
+            // 4. ペイロードを構築
             const payload = {
                 user_email: userEmail,
                 service_name: message.serviceName,
@@ -141,10 +160,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 prompt_text: message.promptText || null,
                 timestamp: message.timestamp,
                 url: message.url,
-                token: CONFIG.AUTH_TOKEN
+                token: authToken
             };
 
-            // 4. GAS へ POST 送信
+            // 5. GAS へ POST 送信
             const result = await postToGas(webhookUrl, payload);
             sendResponse({ success: true, result: result });
         } catch (error) {
