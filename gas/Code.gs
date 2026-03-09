@@ -105,15 +105,34 @@ function doPost(e) {
         if (hasNoSuchFieldError) {
           Logger.log("Field not found. Updating table schema to add prompt_text...");
           addPromptTextColumn();
-          Utilities.sleep(30000); // 30秒待機（BigQueryのスキーマ変更は反映に時間がかかる場合があるため）
-          const retryResponse = BigQuery.Tabledata.insertAll(
-            insertAllRequest,
-            PROJECT_ID,
-            DATASET_ID,
-            TABLE_ID
-          ); // リトライ
-          if (retryResponse.insertErrors && retryResponse.insertErrors.length > 0) {
-            throw new Error("Retry insert errors: " + JSON.stringify(retryResponse.insertErrors));
+
+          let retrySuccess = false;
+          let retryWait = 2000; // 初期待機時間 2秒
+          let lastErrors = null;
+
+          // エクスポネンシャルバックオフによるリトライ (最大3回)
+          for (let attempt = 1; attempt <= 3; attempt++) {
+            Logger.log("Retry attempt " + attempt + " after waiting " + retryWait + "ms...");
+            Utilities.sleep(retryWait);
+
+            const retryResponse = BigQuery.Tabledata.insertAll(
+              insertAllRequest,
+              PROJECT_ID,
+              DATASET_ID,
+              TABLE_ID
+            );
+
+            if (retryResponse.insertErrors && retryResponse.insertErrors.length > 0) {
+              lastErrors = retryResponse.insertErrors;
+              retryWait *= 2; // 次回の待機時間を倍にする (2s -> 4s -> 8s)
+            } else {
+              retrySuccess = true;
+              break;
+            }
+          }
+
+          if (!retrySuccess) {
+            throw new Error("Retry insert errors after backoff: " + JSON.stringify(lastErrors));
           }
         } else {
           throw new Error("Insert errors: " + JSON.stringify(response.insertErrors));
@@ -124,13 +143,34 @@ function doPost(e) {
       if (insertError.message && insertError.message.indexOf("Not found") !== -1) {
         Logger.log("Dataset/Table not found. Auto-creating...");
         createBigQueryTable();
-        Utilities.sleep(2000); // 反映待ち
-        BigQuery.Tabledata.insertAll(
-          insertAllRequest,
-          PROJECT_ID,
-          DATASET_ID,
-          TABLE_ID
-        );
+
+        let retrySuccess = false;
+        let retryWait = 2000;
+
+        // 404時もエクスポネンシャルバックオフでリトライ
+        for (let attempt = 1; attempt <= 3; attempt++) {
+          Utilities.sleep(retryWait);
+          try {
+            BigQuery.Tabledata.insertAll(
+              insertAllRequest,
+              PROJECT_ID,
+              DATASET_ID,
+              TABLE_ID
+            );
+            retrySuccess = true;
+            break;
+          } catch (e) {
+            if (e.message && e.message.indexOf("Not found") !== -1 && attempt < 3) {
+              retryWait *= 2;
+            } else {
+              throw e;
+            }
+          }
+        }
+
+        if (!retrySuccess) {
+          throw new Error("Failed to insert after creating dataset/table");
+        }
       } else {
         throw insertError;
       }
