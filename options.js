@@ -34,7 +34,8 @@
                     action: "ping",
                     prompt_text: "test_prompt",
                     timestamp: new Date().toISOString(),
-                    url: "chrome-extension://options"
+                    url: "chrome-extension://options",
+                    token: "YOUR_SECRET_TOKEN" // GAS側のAUTH_TOKENと一致させる
                 }
             },
             (response) => {

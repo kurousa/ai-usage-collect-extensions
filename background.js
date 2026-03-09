@@ -140,7 +140,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 action: "prompt_submit",
                 prompt_text: message.promptText || null,
                 timestamp: message.timestamp,
-                url: message.url
+                url: message.url,
+                token: "YOUR_SECRET_TOKEN" // GAS側のAUTH_TOKENと一致させる
             };
 
             // 4. GAS へ POST 送信

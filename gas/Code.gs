@@ -15,6 +15,7 @@
 const PROJECT_ID = "YOUR_GCP_PROJECT_ID";     // GCPプロジェクトID
 const DATASET_ID = "ai_usage_logs";            // BigQueryデータセットID
 const TABLE_ID   = "usage_events";             // BigQueryテーブルID
+const AUTH_TOKEN = "YOUR_SECRET_TOKEN";        // 認証用トークン
 
 /**
  * POSTリクエストのエントリーポイント
@@ -36,6 +37,14 @@ function doPost(e) {
       return createResponse(400, {
         success: false,
         error: "Missing required fields: " + missingFields.join(", ")
+      });
+    }
+
+    // 認証トークンの確認
+    if (AUTH_TOKEN !== "YOUR_SECRET_TOKEN" && body.token !== AUTH_TOKEN) {
+      return createResponse(401, {
+        success: false,
+        error: "Unauthorized: Invalid token"
       });
     }
 
