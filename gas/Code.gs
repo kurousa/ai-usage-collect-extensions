@@ -86,8 +86,23 @@ function doPost(e) {
 
       // 200 OK で返るエラー (スキーマ不一致など) を検知
       if (response.insertErrors && response.insertErrors.length > 0) {
-        const errorStr = JSON.stringify(response.insertErrors);
-        if (errorStr.indexOf("no such field") !== -1) {
+
+        // no such field エラーかどうかを insertErrors の中身を走査して確認
+        let hasNoSuchFieldError = false;
+        for (let i = 0; i < response.insertErrors.length; i++) {
+          const errors = response.insertErrors[i].errors;
+          if (errors) {
+            for (let j = 0; j < errors.length; j++) {
+              if (errors[j].reason === "invalid" && errors[j].message && errors[j].message.indexOf("no such field") !== -1) {
+                hasNoSuchFieldError = true;
+                break;
+              }
+            }
+          }
+          if (hasNoSuchFieldError) break;
+        }
+
+        if (hasNoSuchFieldError) {
           Logger.log("Field not found. Updating table schema to add prompt_text...");
           addPromptTextColumn();
           Utilities.sleep(10000); // 10秒待機（BigQueryのスキーマ変更は反映に時間がかかる場合があるため）
@@ -101,7 +116,7 @@ function doPost(e) {
             throw new Error("Retry insert errors: " + JSON.stringify(retryResponse.insertErrors));
           }
         } else {
-          throw new Error("Insert errors: " + errorStr);
+          throw new Error("Insert errors: " + JSON.stringify(response.insertErrors));
         }
       }
     } catch (insertError) {
