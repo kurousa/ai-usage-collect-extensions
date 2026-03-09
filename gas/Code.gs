@@ -68,7 +68,7 @@ function doPost(e) {
     };
 
     try {
-      const response = BigQuery.Tabledata.insertAll(
+      var response = BigQuery.Tabledata.insertAll(
         insertAllRequest,
         PROJECT_ID,
         DATASET_ID,
@@ -81,15 +81,18 @@ function doPost(e) {
         if (errorStr.indexOf("no such field") !== -1) {
           Logger.log("Field not found. Updating table schema to add prompt_text...");
           addPromptTextColumn();
-          Utilities.sleep(2000); // 反映待ち
-          BigQuery.Tabledata.insertAll(
+          Utilities.sleep(5000); // 反映待ち
+          var retryResponse = BigQuery.Tabledata.insertAll(
             insertAllRequest,
             PROJECT_ID,
             DATASET_ID,
             TABLE_ID
           ); // リトライ
+          if (retryResponse.insertErrors && retryResponse.insertErrors.length > 0) {
+            throw new Error("Retry insert errors: " + JSON.stringify(retryResponse.insertErrors));
+          }
         } else {
-          Logger.log("Insert errors: " + errorStr);
+          throw new Error("Insert errors: " + errorStr);
         }
       }
     } catch (insertError) {
