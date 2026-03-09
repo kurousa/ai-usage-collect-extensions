@@ -49,8 +49,9 @@
         /**
          * プロンプト送信を通知する（デバウンス付き）
          * @param {string} trigger - 検知トリガーの種別
+         * @param {string|null} promptText - 送信されたプロンプトのテキスト
          */
-        function notifyUsage(trigger) {
+        function notifyUsage(trigger, promptText = null) {
             const now = Date.now();
             if (now - lastNotifyTime < CONFIG.DEBOUNCE_INTERVAL_MS) {
                 console.log(`[AI Usage Tracker] デバウンス: ${trigger} (スキップ)`);
@@ -63,6 +64,7 @@
                 serviceName: currentServiceKey,
                 serviceDisplayName: currentService.name,
                 trigger: trigger,
+                promptText: promptText,
                 timestamp: new Date().toISOString(),
                 url: location.href
             };
@@ -114,7 +116,9 @@
                     if (matchesSelector || isTextarea || isContentEditable) {
                         // IME変換中（isComposing）は除外
                         if (event.isComposing) return;
-                        notifyUsage("enter_key");
+
+                        let promptText = target.value || target.innerText || target.textContent || "";
+                        notifyUsage("enter_key", promptText.trim());
                     }
                 },
                 true // captureフェーズで先にフック
@@ -138,7 +142,18 @@
                     const selectors = buttonSelectors.split(",").map((s) => s.trim());
                     for (const sel of selectors) {
                         if (target.matches(sel) || target.closest(sel)) {
-                            notifyUsage("send_button_click");
+                            // 入力欄のテキストを取得
+                            let promptText = "";
+                            const textareaSelectors = currentService.selectors.textarea.split(",").map(s => s.trim());
+                            for (const taSel of textareaSelectors) {
+                                const inputArea = document.querySelector(taSel);
+                                if (inputArea) {
+                                    promptText = inputArea.value || inputArea.innerText || inputArea.textContent || "";
+                                    break;
+                                }
+                            }
+
+                            notifyUsage("send_button_click", promptText.trim());
                             return;
                         }
                     }
@@ -180,7 +195,8 @@
                 const responseObserver = new MutationObserver((mutations) => {
                     for (const mutation of mutations) {
                         if (mutation.addedNodes.length > 0) {
-                            notifyUsage("dom_mutation");
+                            // DOM検知時は入力テキストがすでに消えている可能性が高いため null を送る
+                            notifyUsage("dom_mutation", null);
                             return;
                         }
                     }

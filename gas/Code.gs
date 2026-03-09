@@ -52,6 +52,7 @@ function doPost(e) {
       user_email: body.user_email,
       service_name: body.service_name,
       action: body.action,
+      prompt_text: body.prompt_text || null,
       timestamp: body.timestamp,
       url: body.url,
       inserted_at: new Date().toISOString()
@@ -67,17 +68,36 @@ function doPost(e) {
     };
 
     try {
-      BigQuery.Tabledata.insertAll(
+      var response = BigQuery.Tabledata.insertAll(
         insertAllRequest,
         PROJECT_ID,
         DATASET_ID,
         TABLE_ID
       );
+
+      // 200 OK で返るエラー (スキーマ不一致など) を検知
+      if (response.insertErrors && response.insertErrors.length > 0) {
+        var errorStr = JSON.stringify(response.insertErrors);
+        if (errorStr.indexOf("no such field") !== -1) {
+          Logger.log("Field not found. Updating table schema to add prompt_text...");
+          addPromptTextColumn();
+          Utilities.sleep(2000); // 反映待ち
+          BigQuery.Tabledata.insertAll(
+            insertAllRequest,
+            PROJECT_ID,
+            DATASET_ID,
+            TABLE_ID
+          ); // リトライ
+        } else {
+          Logger.log("Insert errors: " + errorStr);
+        }
+      }
     } catch (insertError) {
-      // データセット・テーブルが存在しない場合は自動作成してリトライ
+      // データセット・テーブルが見つからない場合 (404)
       if (insertError.message && insertError.message.indexOf("Not found") !== -1) {
         Logger.log("Dataset/Table not found. Auto-creating...");
         createBigQueryTable();
+        Utilities.sleep(2000); // 反映待ち
         BigQuery.Tabledata.insertAll(
           insertAllRequest,
           PROJECT_ID,
@@ -166,6 +186,7 @@ function createBigQueryTable() {
         { name: "service_name",  type: "STRING",    mode: "REQUIRED", description: "AIサービス名" },
         { name: "action",        type: "STRING",    mode: "REQUIRED", description: "アクション種別" },
         { name: "timestamp",     type: "TIMESTAMP", mode: "REQUIRED", description: "検知日時" },
+        { name: "prompt_text",   type: "STRING",    mode: "NULLABLE", description: "プロンプトのテキスト" },
         { name: "url",           type: "STRING",    mode: "NULLABLE", description: "利用URL" },
         { name: "inserted_at",   type: "TIMESTAMP", mode: "REQUIRED", description: "BQ挿入日時" }
       ]
@@ -181,5 +202,40 @@ function createBigQueryTable() {
     Logger.log("Table created: " + TABLE_ID);
   } catch (e) {
     Logger.log("Table creation error (may already exist): " + e.message);
+  }
+}
+
+/**
+ * 既存のテーブルに prompt_text カラムを追加する
+ */
+function addPromptTextColumn() {
+  try {
+    // 現在のテーブルスキーマを取得
+    var table = BigQuery.Tables.get(PROJECT_ID, DATASET_ID, TABLE_ID);
+    var schema = table.schema;
+    var fields = schema.fields;
+
+    // すでに存在するか確認
+    var hasPromptText = fields.some(function(field) {
+      return field.name === "prompt_text";
+    });
+
+    if (!hasPromptText) {
+      fields.push({
+        name: "prompt_text",
+        type: "STRING",
+        mode: "NULLABLE",
+        description: "プロンプトのテキスト"
+      });
+
+      // テーブルを更新
+      BigQuery.Tables.patch(table, PROJECT_ID, DATASET_ID, TABLE_ID);
+      Logger.log("Successfully added 'prompt_text' column to the table.");
+    } else {
+      Logger.log("'prompt_text' column already exists.");
+    }
+  } catch (e) {
+    Logger.log("Error adding 'prompt_text' column: " + e.message);
+    throw e;
   }
 }

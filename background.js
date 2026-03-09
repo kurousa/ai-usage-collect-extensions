@@ -138,6 +138,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 user_email: userEmail,
                 service_name: message.serviceName,
                 action: "prompt_submit",
+                prompt_text: message.promptText || null,
                 timestamp: message.timestamp,
                 url: message.url
             };

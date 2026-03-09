@@ -32,6 +32,7 @@
                     user_email: "test@example.com",
                     service_name: "connection_test",
                     action: "ping",
+                    prompt_text: "test_prompt",
                     timestamp: new Date().toISOString(),
                     url: "chrome-extension://options"
                 }
