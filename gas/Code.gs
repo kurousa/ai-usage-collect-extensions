@@ -135,14 +135,14 @@ function doPost(e) {
             Logger.log("Retry insert errors after backoff: " + JSON.stringify(lastErrors));
             return createResponse(500, {
               success: false,
-              error: "Retry insert errors after backoff: " + JSON.stringify(lastErrors)
+              error: "An internal error occurred during data insertion. Please contact the administrator."
             });
           }
         } else {
           Logger.log("Insert errors: " + JSON.stringify(response.insertErrors));
           return createResponse(500, {
             success: false,
-            error: "Insert errors: " + JSON.stringify(response.insertErrors)
+            error: "An internal error occurred during data insertion. Please contact the administrator."
           });
         }
       }
@@ -180,14 +180,14 @@ function doPost(e) {
           Logger.log("Failed to insert after creating dataset/table");
           return createResponse(500, {
             success: false,
-            error: "Failed to insert after creating dataset/table"
+            error: "An internal error occurred during data insertion. Please contact the administrator."
           });
         }
       } else {
         Logger.log("Insert error: " + insertError.message);
         return createResponse(500, {
           success: false,
-          error: "Insert error: " + insertError.message
+          error: "An internal error occurred during data insertion. Please contact the administrator."
         });
       }
     }
@@ -204,7 +204,7 @@ function doPost(e) {
     Logger.log("Error in doPost: " + error.message);
     return createResponse(500, {
       success: false,
-      error: error.message
+      error: "An internal server error occurred."
     });
   }
 }
