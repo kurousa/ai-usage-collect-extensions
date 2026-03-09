@@ -15,7 +15,7 @@
 const PROJECT_ID = "YOUR_GCP_PROJECT_ID";     // GCPプロジェクトID
 const DATASET_ID = "ai_usage_logs";            // BigQueryデータセットID
 const TABLE_ID   = "usage_events";             // BigQueryテーブルID
-const AUTH_TOKEN = PropertiesService.getScriptProperties().getProperty('AUTH_TOKEN'); // 認証用トークン
+const AUTH_TOKEN = "YOUR_SECRET_TOKEN";        // 認証用トークン
 
 /**
  * POSTリクエストのエントリーポイント
@@ -41,9 +41,7 @@ function doPost(e) {
     }
 
     // 認証トークンの確認
-    // 認証トークンの確認
-    // 注意: AUTH_TOKENはスクリプトプロパティ等から取得することを推奨します
-    if (!body.token || body.token !== AUTH_TOKEN) {
+    if (AUTH_TOKEN !== "YOUR_SECRET_TOKEN" && body.token !== AUTH_TOKEN) {
       return createResponse(401, {
         success: false,
         error: "Unauthorized: Invalid token"
@@ -115,8 +113,7 @@ function doPost(e) {
             TABLE_ID
           ); // リトライ
           if (retryResponse.insertErrors && retryResponse.insertErrors.length > 0) {
-            Logger.log("Retry insert errors: " + JSON.stringify(retryResponse.insertErrors));
-            throw new Error("Failed to insert data after schema update.");
+            throw new Error("Retry insert errors: " + JSON.stringify(retryResponse.insertErrors));
           }
         } else {
           throw new Error("Insert errors: " + JSON.stringify(response.insertErrors));

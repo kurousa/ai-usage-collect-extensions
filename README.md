@@ -31,7 +31,7 @@
 ### 1. GAS のデプロイ
 
 1. [Google Apps Script](https://script.google.com/) で新しいプロジェクトを作成
-2. `gas/Code.gs` の内容を貼り付け、`PROJECT_ID` を自身のGCPプロジェクトIDに変更
+2. `gas/Code.gs` の内容を貼り付け、`PROJECT_ID` を自身のGCPプロジェクトIDに変更、必要に応じて `AUTH_TOKEN` に認証トークンを設定
 3. 「サービス」→「＋」→「BigQuery API」を追加
 4. 「デプロイ」→「新しいデプロイ」→ ウェブアプリとしてデプロイ
    - **次のユーザーとして実行**: `自分`
@@ -73,6 +73,7 @@ ai-usage-collect-extensions/
 | `user_email` | STRING | ユーザーメールアドレス |
 | `service_name` | STRING | AIサービス名 |
 | `action` | STRING | アクション種別 |
+| `prompt_text` | STRING | 送信したプロンプトのテキスト |
 | `timestamp` | TIMESTAMP | 検知日時 |
 | `url` | STRING | 利用URL |
 | `inserted_at` | TIMESTAMP | BQ挿入日時 |
