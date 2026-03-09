@@ -15,7 +15,7 @@
 const PROJECT_ID = "YOUR_GCP_PROJECT_ID";     // GCPプロジェクトID
 const DATASET_ID = "ai_usage_logs";            // BigQueryデータセットID
 const TABLE_ID   = "usage_events";             // BigQueryテーブルID
-const AUTH_TOKEN = "YOUR_SECRET_TOKEN";        // 認証用トークン
+const AUTH_TOKEN = PropertiesService.getScriptProperties().getProperty('AUTH_TOKEN'); // 認証用トークン
 
 /**
  * POSTリクエストのエントリーポイント
