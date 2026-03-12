@@ -39,6 +39,12 @@ describe('validateUrlLogic', () => {
         expect(result.success).toBeFalsy();
         expect(result.message).toBe('有効なURLを入力してください');
     });
+
+    it('should return error for non-http/https protocol (e.g., ftp)', () => {
+        const result = validateUrlLogic('ftp://example.com');
+        expect(result.success).toBeFalsy();
+        expect(result.message).toBe('http または https のURLを入力してください');
+    });
 });
 
 runTests();

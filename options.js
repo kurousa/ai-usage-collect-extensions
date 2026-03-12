@@ -15,7 +15,10 @@ function validateUrlLogic(url) {
         return { success: false, message: "URLを入力してください" };
     }
     try {
-        new URL(url);
+        const parsedUrl = new URL(url);
+        if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+            return { success: false, message: "http または https のURLを入力してください" };
+        }
         return { success: true };
     } catch (e) {
         return { success: false, message: "有効なURLを入力してください" };
