@@ -5,8 +5,36 @@
  * 監視対象サービスの有効/無効切り替えを管理する。
  */
 
+/**
+ * URL バリデーションの純粋な論理
+ * @param {string} url
+ * @returns {{success: boolean, message?: string}}
+ */
+function validateUrlLogic(url) {
+    if (!url) {
+        return { success: false, message: "URLを入力してください" };
+    }
+    try {
+        const parsedUrl = new URL(url);
+        if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+            return { success: false, message: "http または https のURLを入力してください" };
+        }
+        return { success: true };
+    } catch (e) {
+        return { success: false, message: "有効なURLを入力してください" };
+    }
+}
+
+// Node.js 環境（テスト実行時）のためのエクスポート
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { validateUrlLogic };
+}
+
 (function () {
     "use strict";
+
+    // ブラウザ環境でない場合は実行をスキップ
+    if (typeof document === "undefined") return;
 
     const webhookUrlInput = document.getElementById("webhookUrl");
     const authTokenInput = document.getElementById("authToken");
@@ -53,19 +81,14 @@
         );
     }
 
-    // --- URL バリデーション ---
+    // --- URL バリデーション (UI 連携) ---
     function validateUrl(url) {
-        if (!url) {
-            showStatus("URLを入力してください", "error");
+        const result = validateUrlLogic(url);
+        if (!result.success) {
+            showStatus(result.message, "error");
             return false;
         }
-        try {
-            new URL(url);
-            return true;
-        } catch (e) {
-            showStatus("有効なURLを入力してください", "error");
-            return false;
-        }
+        return true;
     }
 
     // --- 保存して接続テスト ---
@@ -110,7 +133,7 @@
     }
 
     function renderServicesList() {
-        if (!CONFIG || !CONFIG.SERVICES) return;
+        if (typeof CONFIG === "undefined" || !CONFIG.SERVICES) return;
 
         // 保存済みのサービス設定を読み込んでからレンダリング
         chrome.storage.sync.get(["serviceSettings"], (result) => {
