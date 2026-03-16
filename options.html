@@ -58,7 +58,8 @@
       color: #c4b5fd;
     }
 
-    input[type="url"] {
+    input[type="url"],
+    input[type="text"] {
       width: 100%;
       padding: 12px 16px;
       background: rgba(255, 255, 255, 0.06);
@@ -70,12 +71,14 @@
       transition: border-color 0.3s, box-shadow 0.3s;
     }
 
-    input[type="url"]:focus {
+    input[type="url"]:focus,
+    input[type="text"]:focus {
       border-color: #a78bfa;
       box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2);
     }
 
-    input[type="url"]::placeholder {
+    input[type="url"]::placeholder,
+    input[type="text"]::placeholder {
       color: #6b7280;
     }
 
@@ -258,7 +261,7 @@
 
     <div class="form-group">
       <label for="authToken">GAS 認証用トークン</label>
-      <input type="text" id="authToken" placeholder="YOUR_SECRET_TOKEN" />
+      <input type="text" id="authToken" placeholder="your-secret-token" />
       <p style="margin-top: 8px; font-size: 0.8rem; color: #9ca3af;">
         GASスクリプト内で設定した AUTH_TOKEN と同じ値を入力してください。
       </p>

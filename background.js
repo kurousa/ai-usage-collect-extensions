@@ -29,11 +29,7 @@ async function getWebhookUrl() {
 async function getAuthToken() {
     return new Promise((resolve) => {
         chrome.storage.sync.get(["authToken"], (result) => {
-            if (result.authToken !== undefined) {
-                resolve(result.authToken);
-            } else {
-                resolve(CONFIG.AUTH_TOKEN || "");
-            }
+            resolve(result.authToken || "");
         });
     });
 }
@@ -198,3 +194,8 @@ chrome.runtime.onInstalled.addListener((details) => {
 });
 
 console.log("[AI Usage Tracker] Background Service Worker 起動完了");
+
+// Node.js 環境（テスト実行時）のためのエクスポート
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { getAuthToken };
+}
