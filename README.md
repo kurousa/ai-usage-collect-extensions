@@ -31,7 +31,7 @@
 ### 1. GAS のデプロイ
 
 1. [Google Apps Script](https://script.google.com/) で新しいプロジェクトを作成
-2. `gas/Code.gs` の内容を貼り付け、`PROJECT_ID` を自身のGCPプロジェクトIDに変更、必要に応じて `AUTH_TOKEN` に認証トークンを設定
+2. `gas/Code.gs` の内容を貼り付け、`PROJECT_ID` を自身のGCPプロジェクトIDに変更、`AUTH_TOKEN` に任意の認証トークン（シークレット文字列）を設定
 3. 「サービス」→「＋」→「BigQuery API」を追加
 4. 「デプロイ」→「新しいデプロイ」→ ウェブアプリとしてデプロイ
    - **次のユーザーとして実行**: `自分`

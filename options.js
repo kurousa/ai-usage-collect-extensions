@@ -121,9 +121,6 @@ if (typeof module !== "undefined" && module.exports) {
         }
         if (result.authToken !== undefined) {
             authTokenInput.value = result.authToken;
-        } else if (CONFIG && CONFIG.AUTH_TOKEN) {
-            // storageに未保存で、config.jsに定義がある場合はそれを利用
-            authTokenInput.value = CONFIG.AUTH_TOKEN;
         }
     });
 

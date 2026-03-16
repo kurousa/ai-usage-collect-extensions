@@ -15,7 +15,7 @@
 const PROJECT_ID = "YOUR_GCP_PROJECT_ID";     // GCPプロジェクトID
 const DATASET_ID = "ai_usage_logs";            // BigQueryデータセットID
 const TABLE_ID   = "usage_events";             // BigQueryテーブルID
-const AUTH_TOKEN = "YOUR_SECRET_TOKEN";        // 認証用トークン
+const AUTH_TOKEN = "";        // 認証用トークン
 
 /**
  * POSTリクエストのエントリーポイント
@@ -41,7 +41,6 @@ function doPost(e) {
     }
 
     // 認証トークンの確認
-    // 認証トークンの確認
     // AUTH_TOKENがデフォルト値のまま、または未設定の場合はセキュリティリスクのため処理を停止
     if (!AUTH_TOKEN || AUTH_TOKEN === "YOUR_SECRET_TOKEN") {
       Logger.log("Security Alert: AUTH_TOKEN is not configured. Please configure a secret token in gas/Code.gs.");
@@ -51,11 +50,6 @@ function doPost(e) {
       });
     }
     if (body.token !== AUTH_TOKEN) {
-      return createResponse(401, {
-        success: false,
-        error: "Unauthorized: Invalid token"
-      });
-    }
       return createResponse(401, {
         success: false,
         error: "Unauthorized: Invalid token"
