@@ -89,6 +89,8 @@
 
         // --- 戦略1: Enterキー検知 ---
         function setupEnterKeyDetection() {
+            const textareaSelectors = currentService.selectors.textarea.split(",").map(s => s.trim());
+
             document.addEventListener(
                 "keydown",
                 (event) => {
@@ -107,10 +109,8 @@
                     if (!isTextarea && !isContentEditable) return;
 
                     // 対象サービスのセレクタにマッチするか確認
-                    const selectors = currentService.selectors.textarea;
-                    const matchesSelector = selectors
-                        .split(",")
-                        .some((sel) => target.matches(sel.trim()));
+                    const matchesSelector = textareaSelectors
+                        .some((sel) => target.matches(sel));
 
                     // セレクタがマッチするか、もしくは入力エリアとして妥当な要素か
                     if (matchesSelector || isTextarea || isContentEditable) {
@@ -130,6 +130,8 @@
         // --- 戦略2: 送信ボタンクリック検知 ---
         function setupSendButtonDetection() {
             const buttonSelectors = currentService.selectors.sendButton;
+            const selectors = buttonSelectors.split(",").map((s) => s.trim());
+            const textareaSelectors = currentService.selectors.textarea.split(",").map(s => s.trim());
 
             // クリックイベントのデリゲーション（動的要素対応）
             document.addEventListener(
@@ -139,12 +141,10 @@
                     if (!target) return;
 
                     // ボタン自体、またはボタンの子要素（アイコン等）がクリックされた場合
-                    const selectors = buttonSelectors.split(",").map((s) => s.trim());
                     for (const sel of selectors) {
                         if (target.matches(sel) || target.closest(sel)) {
                             // 入力欄のテキストを取得
                             let promptText = "";
-                            const textareaSelectors = currentService.selectors.textarea.split(",").map(s => s.trim());
                             for (const taSel of textareaSelectors) {
                                 // 複数見つかる可能性がある場合、入力がある要素を優先して探す
                                 const inputAreas = document.querySelectorAll(taSel);
@@ -174,13 +174,14 @@
             const responseSelectors = currentService.selectors.responseArea;
             if (!responseSelectors) return;
 
+            const selectors = responseSelectors.split(",").map((s) => s.trim());
+
             // 応答エリアの出現を待ち、子要素の追加を監視する
             let observingResponse = false;
 
             const bodyObserver = new MutationObserver(() => {
                 if (observingResponse) return;
 
-                const selectors = responseSelectors.split(",").map((s) => s.trim());
                 for (const sel of selectors) {
                     const responseArea = document.querySelector(sel);
                     if (responseArea) {
