@@ -167,12 +167,9 @@ if (typeof module !== "undefined" && module.exports) {
                         item.classList.add("disabled");
                     }
 
-                    // chrome.storage に保存
-                    chrome.storage.sync.get(["serviceSettings"], (res) => {
-                        const current = res.serviceSettings || {};
-                        current[serviceKey] = enabled;
-                        saveServiceSettings(current);
-                    });
+                    // chrome.storage に保存 (上位スコープの settings オブジェクトを更新)
+                    settings[serviceKey] = enabled;
+                    saveServiceSettings(settings);
                 });
 
                 const slider = document.createElement("span");
