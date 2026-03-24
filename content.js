@@ -69,7 +69,13 @@
                 url: location.href
             };
 
-            console.log(`[AI Usage Tracker] 送信検知: ${trigger}`, payload);
+            // セキュリティのため、プロンプト等の機密情報を含むペイロード全文はログ出力しない
+            console.log(`[AI Usage Tracker] 送信検知: ${trigger}`, {
+                type: payload.type,
+                serviceName: payload.serviceName,
+                trigger: payload.trigger,
+                timestamp: payload.timestamp
+            });
 
             try {
                 chrome.runtime.sendMessage(payload, (response) => {
@@ -80,7 +86,8 @@
                         );
                         return;
                     }
-                    console.log("[AI Usage Tracker] background応答:", response);
+                    // セキュリティのため、機密情報を含む可能性がある応答全文はログ出力しない
+                    console.log("[AI Usage Tracker] background応答:", response ? { success: response.success, service_name: response.result?.service_name } : { success: false, error: "no response" });
                 });
             } catch (err) {
                 console.warn("[AI Usage Tracker] sendMessage例外:", err);

@@ -200,12 +200,14 @@ function doPost(e) {
       }
     }
 
-    Logger.log("BigQuery insert success: " + JSON.stringify(row));
+    // セキュリティのため、プロンプト等の機密情報を含む行データ全文はログ出力しない
+    Logger.log("BigQuery insert success: " + row.service_name + " / " + row.action);
 
     return createResponse(200, {
       success: true,
       message: "Data inserted successfully",
-      data: row
+      // レスポンスにも機密情報を含めないようにする
+      service_name: row.service_name
     });
 
   } catch (error) {
@@ -237,7 +239,8 @@ function doGet(e) {
  * @returns {ContentService.TextOutput} JSON応答
  */
 function createResponse(statusCode, data) {
-  Logger.log("Response [" + statusCode + "]: " + JSON.stringify(data));
+  // セキュリティのため、機密情報を含む可能性があるレスポンス全文はログ出力しない
+  Logger.log("Response [" + statusCode + "]: " + JSON.stringify({ success: data.success, message: data.message, error: data.error }));
   return ContentService
     .createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);

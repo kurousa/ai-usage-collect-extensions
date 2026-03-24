@@ -77,7 +77,8 @@ async function postToGas(url, data, retryCount = CONFIG.MAX_RETRY_COUNT) {
         }
 
         const result = await response.json();
-        console.log("[AI Usage Tracker] GAS送信成功:", result);
+        // セキュリティのため、プロンプト等の機密情報を含むレスポンス全文はログ出力しない
+        console.log("[AI Usage Tracker] GAS送信成功:", { success: result.success, service_name: result.service_name });
         return result;
     } catch (error) {
         console.warn(
@@ -129,7 +130,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return false;
     }
 
-    console.log("[AI Usage Tracker] 送信検知メッセージ受信:", message);
+    // セキュリティのため、プロンプト等の機密情報を含むメッセージ全文はログ出力しない
+    console.log("[AI Usage Tracker] 送信検知メッセージ受信:", {
+        type: message.type,
+        serviceName: message.serviceName,
+        trigger: message.trigger,
+        timestamp: message.timestamp
+    });
 
     // 非同期処理を行うため true を返して sendResponse を保持
     (async () => {
