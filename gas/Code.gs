@@ -240,7 +240,7 @@ function doGet(e) {
  */
 function createResponse(statusCode, data) {
   // セキュリティのため、機密情報を含む可能性があるレスポンス全文はログ出力しない
-  Logger.log("Response [" + statusCode + "]: " + (data.success ? "success" : "error: " + data.error));
+  Logger.log("Response [" + statusCode + "]: " + JSON.stringify({ success: data.success, message: data.message, error: data.error }));
   return ContentService
     .createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);
