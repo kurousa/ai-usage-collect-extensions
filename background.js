@@ -78,7 +78,7 @@ async function postToGas(url, data, retryCount = CONFIG.MAX_RETRY_COUNT) {
 
         const result = await response.json();
         // セキュリティのため、プロンプト等の機密情報を含むレスポンス全文はログ出力しない
-        console.log("[AI Usage Tracker] GAS送信成功:", result.success);
+        console.log("[AI Usage Tracker] GAS送信成功:", { success: result.success, service_name: result.service_name });
         return result;
     } catch (error) {
         console.warn(
